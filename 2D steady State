@@ -1,0 +1,46 @@
+% 2D Steady-State Conduction in a Copper Plate
+% Using Finite Difference Method
+
+% Define parameters
+L = 0.1; % Length of the plate (in meters)
+W = 0.1; % Width of the plate (in meters)
+T_init = 100; % Initial temperature (in degrees Celsius)
+T_boundary = 0; % Temperature at boundaries (in degrees Celsius)
+thermal_conductivity = 385; % Thermal conductivity of copper (in W/(m*K))
+grid_points = 50; % Number of grid points in each dimension
+
+% Discretize the plate
+dx = L / (grid_points - 1);
+dy = W / (grid_points - 1);
+
+% Initialize temperature matrix
+T = T_init * ones(grid_points, grid_points);
+
+% Set boundary conditions
+T(:, 1) = T_boundary;
+T(:, end) = T_boundary;
+T(1, :) = T_boundary;
+T(end, :) = T_boundary;
+
+% Perform iterative solution
+num_iterations = 1000; % Number of iterations
+for iter = 1:num_iterations
+    T_new = T;
+    for i = 2:(grid_points - 1)
+        for j = 2:(grid_points - 1)
+            % Apply finite difference formula
+            T_new(i, j) = (T(i+1, j) + T(i-1, j) + T(i, j+1) + T(i, j-1)) / 4;
+        end
+    end
+    T = T_new;
+end
+
+% Display the results
+[X, Y] = meshgrid(0:dx:L, 0:dy:W);
+figure;
+surf(X, Y, T');
+title('Temperature Distribution in Copper Plate');
+xlabel('Length (m)');
+ylabel('Width (m)');
+zlabel('Temperature (°C)');
+colorbar;
